@@ -641,16 +641,17 @@ export function CertificatesSection() {
   }, [])
 
   const nextSlide = () => {
-    if (currentIndex < filteredCertificates.length - itemsPerView) {
-      setCurrentIndex((prev) => prev + 1)
-    }
-  }
+  setCurrentIndex((prev) =>
+    prev >= filteredCertificates.length - 1 ? 0 : prev + 1
+  )
+}
 
-  const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1)
-    }
-  }
+const prevSlide = () => {
+  setCurrentIndex((prev) =>
+    prev <= 0 ? filteredCertificates.length - 1 : prev - 1
+  )
+}
+
 
 
   const visibleCertificates = showAll
