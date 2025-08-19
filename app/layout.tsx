@@ -45,9 +45,12 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
   },
-  themeColor: "#0a192f",
-  viewport: "width=device-width, initial-scale=1",
   generator: "v0.app",
+}
+
+export const viewport = {
+  themeColor: "#0a192f",
+  viewport: "width=device-width, initial-scale=1"
 }
 
 export default function RootLayout({

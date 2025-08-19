@@ -641,20 +641,17 @@ export function CertificatesSection() {
   }, [])
 
   const nextSlide = () => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setCurrentIndex((prev) => (prev + itemsPerView >= filteredCertificates.length ? 0 : prev + itemsPerView))
-    setTimeout(() => setIsTransitioning(false), 500)
+    if (currentIndex < filteredCertificates.length - itemsPerView) {
+      setCurrentIndex((prev) => prev + 1)
+    }
   }
 
   const prevSlide = () => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setCurrentIndex((prev) =>
-      prev === 0 ? Math.max(0, filteredCertificates.length - itemsPerView) : Math.max(0, prev - itemsPerView),
-    )
-    setTimeout(() => setIsTransitioning(false), 500)
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1)
+    }
   }
+
 
   const visibleCertificates = showAll
     ? filteredCertificates
@@ -690,10 +687,9 @@ export function CertificatesSection() {
               }}
               className={`
                 px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300
-                ${
-                  selectedCategory === category
-                    ? "bg-[#64ffda] text-[#0a192f] shadow-lg"
-                    : "bg-[#112240] text-[#64ffda] border border-[#64ffda]/30 hover:border-[#64ffda] hover:bg-[#64ffda]/10"
+                ${selectedCategory === category
+                  ? "bg-[#64ffda] text-[#0a192f] shadow-lg"
+                  : "bg-[#112240] text-[#64ffda] border border-[#64ffda]/30 hover:border-[#64ffda] hover:bg-[#64ffda]/10"
                 }
               `}
             >
@@ -716,21 +712,29 @@ export function CertificatesSection() {
 
               <div className="flex-1 mx-6 overflow-hidden">
                 <div
-                  className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-transform duration-500 ease-in-out ${isTransitioning ? "transform" : ""}`}
-                  style={{
-                    transform: `translateX(-${(currentIndex % filteredCertificates.length) * (100 / itemsPerView)}%)`,
+                  className="flex transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)]"
+                  style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
+                  onTransitionEnd={() => {
+                    if (currentIndex >= filteredCertificates.length) {
+                      setIsTransitioning(false)
+                      setCurrentIndex(0) // volta para o início
+                    }
                   }}
                 >
                   {[...filteredCertificates, ...filteredCertificates.slice(0, itemsPerView)].map((cert, index) => (
                     <div
-                      key={`${cert.id}-${index}`}
-                      className={`transition-all duration-500 ${isTransitioning ? "scale-95 opacity-80" : "scale-100 opacity-100"}`}
+                      key={index}
+                      className="flex-shrink-0 px-3"
+                      style={{ width: `${100 / itemsPerView}%` }}
                     >
                       <CertificateCard certificate={cert} onClick={() => setSelectedCert(cert)} />
                     </div>
                   ))}
                 </div>
               </div>
+
+
+
 
               <button
                 onClick={nextSlide}
@@ -754,10 +758,9 @@ export function CertificatesSection() {
                   }}
                   className={`
                     transition-all duration-500 rounded-full
-                    ${
-                      Math.floor(currentIndex / itemsPerView) === index
-                        ? "w-8 h-3 bg-[#64ffda]"
-                        : "w-3 h-3 bg-[#64ffda]/30 hover:bg-[#64ffda]/50 hover:scale-125"
+                    ${Math.floor(currentIndex / itemsPerView) === index
+                      ? "w-8 h-3 bg-[#64ffda]"
+                      : "w-3 h-3 bg-[#64ffda]/30 hover:bg-[#64ffda]/50 hover:scale-125"
                     }
                   `}
                 />
@@ -799,11 +802,10 @@ function CertificateCard({ certificate, onClick }: { certificate: Certificate; o
   return (
     <div
       onClick={onClick}
-      className={`group cursor-pointer backdrop-blur-sm border rounded-lg overflow-hidden hover:transform hover:-translate-y-2 transition-all duration-300 ${
-        certificate.featured
-          ? "bg-gradient-to-br from-[#64ffda]/10 to-[#b38728]/10 border-[#64ffda]/40 shadow-lg shadow-[#64ffda]/20"
-          : "bg-[#112240]/50 border-[#64ffda]/20 hover:border-[#64ffda]/40"
-      }`}
+      className={`group cursor-pointer backdrop-blur-sm border rounded-lg overflow-hidden hover:transform hover:-translate-y-2 transition-all duration-300 ${certificate.featured
+        ? "bg-gradient-to-br from-[#64ffda]/10 to-[#b38728]/10 border-[#64ffda]/40 shadow-lg shadow-[#64ffda]/20"
+        : "bg-[#112240]/50 border-[#64ffda]/20 hover:border-[#64ffda]/40"
+        }`}
     >
       {/* Featured Badge */}
       {certificate.featured && (
@@ -846,11 +848,10 @@ function CertificateCard({ certificate, onClick }: { certificate: Certificate; o
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span
-            className={`px-2 py-1 text-xs font-mono rounded border ${
-              certificate.featured
-                ? "bg-[#64ffda]/20 text-[#64ffda] border-[#64ffda]/40"
-                : "bg-[#64ffda]/10 text-[#64ffda] border-[#64ffda]/20"
-            }`}
+            className={`px-2 py-1 text-xs font-mono rounded border ${certificate.featured
+              ? "bg-[#64ffda]/20 text-[#64ffda] border-[#64ffda]/40"
+              : "bg-[#64ffda]/10 text-[#64ffda] border-[#64ffda]/20"
+              }`}
           >
             {certificate.category}
           </span>
@@ -864,11 +865,10 @@ function CertificateCard({ certificate, onClick }: { certificate: Certificate; o
         </div>
 
         <h3
-          className={`font-serif text-lg font-medium mb-1 transition-colors line-clamp-2 ${
-            certificate.featured
-              ? "text-[#64ffda] group-hover:text-[#b38728]"
-              : "text-[#f5f0e1] group-hover:text-[#64ffda]"
-          }`}
+          className={`font-serif text-lg font-medium mb-1 transition-colors line-clamp-2 ${certificate.featured
+            ? "text-[#64ffda] group-hover:text-[#b38728]"
+            : "text-[#f5f0e1] group-hover:text-[#64ffda]"
+            }`}
         >
           {certificate.title}
         </h3>
@@ -979,11 +979,10 @@ function CertificateModal({ certificate, onClose }: { certificate: Certificate; 
                   {certificate.skills.map((skill, index) => (
                     <span
                       key={skill}
-                      className={`px-3 py-1 rounded-lg border transition-all duration-200 ${
-                        index < 3
-                          ? "bg-[#64ffda]/20 text-[#64ffda] border-[#64ffda]/40 font-medium"
-                          : "bg-[#112240] text-[#8892b0] border-[#64ffda]/20 hover:border-[#64ffda]/40 hover:text-[#64ffda]"
-                      }`}
+                      className={`px-3 py-1 rounded-lg border transition-all duration-200 ${index < 3
+                        ? "bg-[#64ffda]/20 text-[#64ffda] border-[#64ffda]/40 font-medium"
+                        : "bg-[#112240] text-[#8892b0] border-[#64ffda]/20 hover:border-[#64ffda]/40 hover:text-[#64ffda]"
+                        }`}
                     >
                       {skill}
                     </span>

@@ -24,6 +24,7 @@ export class PerformanceMonitor {
   }
 
   private initializeObservers() {
+    if (typeof window === "undefined") return
     if (!("PerformanceObserver" in window)) return
 
     // Long Task Observer
