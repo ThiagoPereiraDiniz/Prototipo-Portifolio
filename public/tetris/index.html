@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris - Thiago Pereira Diniz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>TETRIS</h1>
+            <div class="score-container">
+                <div class="score-item">
+                    <span>Score</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Level</span>
+                    <span id="level">1</span>
+                </div>
+                <div class="score-item">
+                    <span>Lines</span>
+                    <span id="lines">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="next-piece">
+                <h3>Next</h3>
+                <canvas id="nextCanvas" width="120" height="120"></canvas>
+            </div>
+            
+            <canvas id="gameCanvas" width="300" height="600"></canvas>
+            
+            <div class="controls">
+                <h3>Controls</h3>
+                <div class="control-item">
+                    <span>←→</span>
+                    <span>Move</span>
+                </div>
+                <div class="control-item">
+                    <span>↓</span>
+                    <span>Soft Drop</span>
+                </div>
+                <div class="control-item">
+                    <span>↑</span>
+                    <span>Rotate</span>
+                </div>
+                <div class="control-item">
+                    <span>Space</span>
+                    <span>Hard Drop</span>
+                </div>
+                <div class="control-item">
+                    <span>P</span>
+                    <span>Pause</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-footer">
+            <button id="startBtn">Start Game</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+        
+        <div id="gameOver" class="game-over hidden">
+            <div class="game-over-content">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <button id="restartBtn">Play Again</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
