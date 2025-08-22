@@ -1,71 +1,33 @@
-"use client"
+// src/components/ui/ProjectsSection.tsx
 
-import { useState } from "react"
+"use client";
 
-interface ProjectData {
-  id: string
-  title: string
-  description: string
-  technologies: string[]
-  link: string
-  hologramType: "arrakis-ui" | "thopter-patterns" | "bene-gesserit" | "tetris-game"
-}
-
-const projects: ProjectData[] = [
-  {
-    id: "arrakis-ui",
-    title: "Arrakis UI Framework",
-    description: "House Atreides-approved interface patterns",
-    technologies: ["Spline", "Three.js", "Quantum CSS"],
-    link: "#",
-    hologramType: "arrakis-ui",
-  },
-  {
-    id: "thopter-patterns",
-    title: "Ornithopter Flight Simulator",
-    description: "Interactive flight pattern visualization with desert adaptation protocols",
-    technologies: ["WebGL", "Fluid Dynamics", "Framer Motion"],
-    link: "#",
-    hologramType: "thopter-patterns",
-  },
-  {
-    id: "registration-system",
-    title: "Sistema de Inscrições Full Stack",
-    description:
-      "Plataforma completa de inscrições desenvolvida com Node.js, Express e MongoDB. Inclui autenticação JWT, validação de dados, dashboard administrativo e sistema de notificações por email.",
-    technologies: ["Node.js", "Express", "MongoDB", "JWT", "React", "Tailwind CSS"],
-    link: "#",
-    hologramType: "arrakis-ui",
-  },
-  {
-    id: "ecommerce-dashboard",
-    title: "Dashboard E-commerce Analytics",
-    description:
-      "Dashboard interativo para análise de vendas e métricas de e-commerce. Visualizações em tempo real, relatórios personalizados e integração com APIs de pagamento.",
-    technologies: ["React", "Chart.js", "Node.js", "PostgreSQL", "TypeScript"],
-    link: "#",
-    hologramType: "thopter-patterns",
-  },
-  {
-    id: "tetris-game",
-    title: "Tetris Game",
-    description:
-      "Jogo Tetris completo desenvolvido com JavaScript vanilla, HTML5 Canvas e CSS3. Inclui sistema de pontuação, níveis progressivos, preview da próxima peça e controles responsivos.",
-    technologies: ["JavaScript", "HTML5 Canvas", "CSS3", "Game Logic"],
-    link: "/tetris",
-    hologramType: "tetris-game",
-  },
-]
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+// Caminho de importação para o arquivo de dados
+import { projects, ProjectData } from "../data/projects";
 
 const hologramGradients = {
   "arrakis-ui": "from-[#172a45] to-[#5e2ca5]",
   "thopter-patterns": "from-[#ff8a00] to-[#5e2ca5]",
   "bene-gesserit": "from-[#64ffda] to-[#172a45]",
   "tetris-game": "from-[#64ffda] to-[#172a45]",
-}
+};
 
 export function ProjectsSection() {
-  const [hoveredProject, setHoveredProject] = useState<string | null>(null)
+  const [hoveredProject, setHoveredProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
+
+  const handleOpenModal = (project: ProjectData) => {
+    setSelectedProject(project);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProject(null);
+  };
 
   return (
     <section id="projects" className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-[#172a45] relative">
@@ -91,35 +53,16 @@ export function ProjectsSection() {
                 >
                   {/* Project Card */}
                   <div className="bg-[#0a192f]/50 rounded-lg overflow-hidden border border-[#64ffda]/10 group-hover:border-[#64ffda]/30 transition-all duration-300">
-                    {/* Hologram Display */}
+                    {/* Hologram Display (agora com a imagem) */}
                     <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
-                      <div
-                        className={`
-                          absolute inset-0 bg-gradient-to-br ${hologramGradients[project.hologramType]} opacity-70
-                          group-hover:opacity-100 transition-all duration-500 group-hover:scale-105
-                        `}
+                      <Image
+                        src={project.image}
+                        alt={`Screenshot do projeto ${project.title}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
-
                       {/* Scanline Effect */}
                       <div className="scanline-effect absolute inset-0" />
-
-                      {/* Hologram Content Placeholder */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-[#64ffda] text-2xl sm:text-3xl md:text-4xl opacity-50 group-hover:opacity-80 transition-opacity">
-                          {project.hologramType === "arrakis-ui" && "🏛️"}
-                          {project.hologramType === "thopter-patterns" && "🚁"}
-                          {project.hologramType === "bene-gesserit" && "🔮"}
-                          {project.hologramType === "tetris-game" && "🎮"}
-                        </div>
-                      </div>
-
-                      {/* Hover scan line */}
-                      <div
-                        className={`
-                          absolute top-0 left-0 w-full h-1 bg-[#64ffda] transform -translate-x-full
-                          ${hoveredProject === project.id ? "animate-[scan_0.8s_ease-in-out]" : ""}
-                        `}
-                      />
                     </div>
 
                     {/* Project Details */}
@@ -144,13 +87,14 @@ export function ProjectsSection() {
                         {project.description}
                       </p>
 
-                      <a
-                        href={project.link}
+                      {/* Botão que abre o modal */}
+                      <button
+                        onClick={() => handleOpenModal(project)}
                         className="inline-flex items-center gap-2 font-mono text-xs sm:text-sm text-[#64ffda] hover:text-[#ff8a00] transition-colors group/link"
                       >
-                        Access Archives
+                        Ver detalhes
                         <span className="transform group-hover/link:translate-x-1 transition-transform">→</span>
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -159,6 +103,54 @@ export function ProjectsSection() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes do Projeto */}
+      {selectedProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#172a45] rounded-lg p-6 max-w-2xl w-full relative border border-[#64ffda]/20 overflow-y-auto max-h-[90vh]">
+            <button onClick={handleCloseModal} className="absolute top-4 right-4 text-white text-lg">
+              &times;
+            </button>
+            <h3 className="font-serif text-2xl font-medium mb-4 text-[#64ffda]">{selectedProject.title}</h3>
+            <Image
+              src={selectedProject.image}
+              alt={selectedProject.title}
+              width={600}
+              height={400}
+              className="rounded-lg mb-4"
+            />
+            {/* Usa ReactMarkdown para renderizar o texto com formatação */}
+            <div className="text-white mb-4">
+              <ReactMarkdown rehypePlugins={[rehypeRaw]}>{selectedProject.fullDescription}</ReactMarkdown>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {selectedProject.technologies.map((tech) => (
+                <span key={tech} className="px-2 py-1 text-xs font-mono bg-[#64ffda]/10 text-[#64ffda] rounded">
+                  {tech}
+                </span>
+              ))}
+            </div>
+            {/* Renderiza os links apenas se existirem */}
+            <div className="flex gap-4">
+              {selectedProject.link && (
+                <a href={selectedProject.link} className="font-mono text-sm text-[#ff8a00] hover:underline" target="_blank" rel="noopener noreferrer">
+                  Acessar site
+                </a>
+              )}
+              {selectedProject.githubLink && (
+                <a href={selectedProject.githubLink} className="font-mono text-sm text-[#ff8a00] hover:underline" target="_blank" rel="noopener noreferrer">
+                  Ver no GitHub
+                </a>
+              )}
+              {!selectedProject.link && !selectedProject.githubLink && (
+                <span className="font-mono text-sm text-[#f5f0e1]/50">
+                  Sem links de acesso disponíveis.
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
-  )
+  );
 }
